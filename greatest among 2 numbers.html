@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GREATEST AMONG 2 NUMBERS</title>
+   <script type="text/javascript">
+    findresult=()=>
+   {
+    var a=parseInt(document.getElementById("t1").value);
+    var b=parseInt(document.getElementById("t2").value);
+    if(a>b)
+    {
+        document.getElementById("ans").innerHTML= "The Greatest Number is " +(a);
+    }
+    else
+    { 
+        document.getElementById("ans").innerHTML= (b) +" is the Greatest Number";
+    }
+
+   }
+   </script>
+</head>
+<body>
+    <input type="text" id="t1" placeholder="Enter Number 1">
+    <br>
+    <input type="text" id="t2" placeholder="Enter Number 2">
+    <br>
+    <input type="button" onclick="findresult()" value="result">
+    <div id="ans"></div>
+</body>
+</html>
