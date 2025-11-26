@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SUM Series</title>
+    <script type="text/javascript">
+    function show()
+    {
+        var n1=parseInt(document.getElementById("t1").value);
+        var n2=parseInt(document.getElementById("t2").value);
+        var s=0;
+        for(i=n1; i<n2; i++)
+        {
+        s=s+i;
+        document.write(`${i}+`)
+      }
+        document.write(n2+"="+(s+n2));
+    /*
+    for(i=n1; i<=n2; i++)
+        {
+        s=s+i;
+        if(i==n2)
+        document.write(i);
+        else
+        document.write(i+ "+");
+        }
+        document.write("=" +s)
+    */
+    // show=()=>{ }
+    }
+    </script>
+</head>
+<body>
+    <input type="text" id="t1" placeholder="Enter Start Number">
+    <br>
+    <input type="text" id="t2" placeholder="Enter End Number">
+    <br>
+    <button onclick="show()">TOUCH ME</button>
+</body>
+</html>

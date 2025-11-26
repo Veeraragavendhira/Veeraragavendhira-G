@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NESTED IF</title>
+    <script type="text/javascript">
+        findres=()=>
+        {
+        var mark1=parseInt(document.getElementById("mark1").value);
+        var mark2=parseInt(document.getElementById("mark2").value);
+        var mark3=parseInt(document.getElementById("mark3").value);
+        var mark4=parseInt(document.getElementById("mark4").value);
+        var mark5=parseInt(document.getElementById("mark5").value);
+        var total = mark1 + mark2 + mark3 + mark4 + mark5;
+        var average=total/5.0;
+        var result="";
+        var grade="";
+        if(mark1>34 && mark2>34 && mark3>34 && mark4>34 && mark5>34)
+        {
+            result="PASS";
+        }
+        else
+        {
+            result="FAIL";
+        }
+        if(result="PASS")
+        {
+        if(average>=85)
+        {
+
+        grade="Outstanding";
+        }
+        else if(average>=75)
+        {
+            grade="Excellent";
+        }
+        else if(average>65)
+        {
+            grade="Very Good";
+        }
+        else if(average>55)
+        {
+            grade="Good"
+        }
+        else
+        {
+            grade="Fair"
+        }
+        }
+        else
+        {
+            grade="****"
+        }
+            document.getElementById("ans1").innerHTML ="Total: " +total;
+            document.getElementById("ans2").innerHTML ="Average: " +average;
+            document.getElementById("ans3").innerHTML ="Result: " +result;
+            document.getElementById("ans4").innerHTML ="Grade: " +grade;
+        }    
+</script>
+</head>
+<body>
+    <input type="text" id="mark1" placeholder="Enter mark1"><br>
+    <input type="text" id="mark2" placeholder="Enter mark2"><br>
+    <input type="text" id="mark3" placeholder="Enter mark3"><br>
+    <input type="text" id="mark4" placeholder="Enter mark4"><br>
+    <input type="text" id="mark5" placeholder="Enter mark5"><br>
+    <br>
+    <input type="button" onclick="findres()" value="FIND TOTAL AVERAGE RESULT GRADE ">
+    <div id="ans1"></div>
+    <div id="ans2"></div>
+    <div id="ans3"></div>
+    <div id="ans4"></div>
+</body>
+</html>

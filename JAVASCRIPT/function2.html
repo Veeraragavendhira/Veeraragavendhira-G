@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script type="text/javascript">
+        total=()=>
+        {
+            var n1=document.getElementById("t1").value;
+            var n2=document.getElementById("t2").value;
+            var total=parseInt(n1)+parseInt(n2);
+            document.getElementById("res").innerHTML="TOTAL:" +total; //displays the output in same page
+        }
+        show=()=>
+        {
+            document.getElementById("res").innerHTML="Typing....";  //while typing it shows typing
+        }
+        show1=()=>
+        {
+            document.getElementById("res").innerHTML="end"; //while not typing it shows typing
+        }
+    </script>
+</head>
+<body>
+    <input type="text" onkeydown="show()" onkeyup="show1()" id="t1" placeholder="Enter n1"><br>
+    <input type="text" id="t2" placeholder="Enter n2"><br>
+    <button onclick="total()">TOTAL</button>
+    <!-- <input type="button" onclick="dis()" value="total"> -->
+    <div id="res"></div>
+</body>
+</html>

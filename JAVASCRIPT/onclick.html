@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ONCLICK / DOUBLE CLICK</title>
+    <script type="text/javascript">
+        function show()
+        {
+            document.write("clicked");
+        }
+        disp=()=> //  => refers function assigning       
+        {
+            document.write("showed");
+        }
+        disp1=()=>  //=> refers function assigning       
+        {
+            document.write("DOUBLE CLICKED");
+            
+        }
+        add=(a,b)=>
+        {
+            document.write("<h2>Total:" +(a+b)+"</h2>");
+        }
+        sub=(a,b)=>
+        {
+            document.write("<h2>Total:" +(a-b)+"</h2>");
+        }
+        multi=(a,b,c,d,e)=>
+        {
+            // document.write("<h2>Total:" +(a+b-c+d-e)+"</h2>");//
+            document.write("<h2>Total:" +(a+b+c+d+e)+"</h2>");
+        }
+        test1=()=>
+        {
+            console.log("CURSOR IN")
+            document.getElementById("t1").style.backgroundColor="blue";
+        }
+        test2=()=>
+        {
+            console.log("CURSOR OUT")
+         document.getElementById("t1").style.backgroundColor="pink";
+        }
+    </script>
+</head>
+<body>
+    <button onclick="show()">SHOW</button> <!-- ONCLICK -->
+    <button onclick="disp()">DISPLAY</button> <!-- ONCLICK -->
+    <button ondblclick="disp1()">DOUBLE CLICK</button> <!-- doUBLE CLICK -->
+    <button onclick="add(10,9)">ADDITION</button> <!-- ONCLICK -->
+    <button onclick="multi(10,9,2,3,111)">ADDITION MULTI VALUE</button> <!-- ONCLICK -->
+    <button onclick="sub(10,9)">SUBTRACTION</button> <!-- ONCLICK -->
+    <input type="button" onclick="add(10,18)" value="FIND TOTAL">
+    <br>
+    <input type="text" id="t1" onfocus="test1()" onblur="test2()">
+
+</body>
+</html>

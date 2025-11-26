@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logical</title>
+    <script type="text/javascript">
+        var m1=100;
+        var m2=99;
+        var m3=100;
+        var m4=100;
+        var m5=33;
+        var res=(m1>34 && m2>34 && m3>34 && m4>34 && m5>34)
+                //true    true      true      true    false   ans: True
+        document.write("<br> answer:" +res)
+        var nammadhaa=(m1>34 || m2>34 || m3>34 || m4>34 || m5>34)
+            //         true       true    true     true     false     ans: True
+        document.write("<br> nammadha : " +nammadhaa)
+        var nammadhaa= ! (m1>34 || m2>34 || m3>34 || m4>34 || m5>34)
+            //         true       true    true     true     false     ans: False(because of NOT)
+        document.write("<br> nammadha : " +nammadhaa)
+        </script>
+</head>
+<body>
+    
+</body>
+</html>

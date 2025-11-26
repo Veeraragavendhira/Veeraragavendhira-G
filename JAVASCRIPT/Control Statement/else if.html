@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Else if</title>
+    <script type="text/javascript">
+findresult=()=>
+   {
+    var m=parseInt(document.getElementById("t1").value);
+if(m == 100)
+    {
+        document.getElementById("ans").innerHTML="Marvellous";
+    }
+    else if(m>=85)
+    {
+     document.getElementById("ans").innerHTML=(m) +" excellent";    
+    }
+    else if(m>=75)
+    {
+    document.getElementById("ans").innerHTML=(m) +" good";    
+    }
+    else if(m>=65){
+    document.getElementById("ans").innerHTML=(m) +" not Bad";    
+}
+else
+     {
+         document.getElementById("ans").innerHTML=(m) +" Fail You idiot";
+     }
+       }
+   </script>
+</head>
+<body>
+    <input type="text" id="t1" placeholder="Enter Mark">
+    <br>
+    <input type="button" onclick="findresult()" value="result">
+    <div id="ans"></div>
+</body>
+</html>
