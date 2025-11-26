@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The 15 Puzzle Game</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom styles for the game board, ensuring responsiveness and aesthetics */
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&display=swap');
+
+        :root {
+            --tile-color: #007bff; /* Blue */
+            --bg-color: #f0f4f8; /* Light gray-blue */
+            --empty-color: #e9ecef; /* Very light gray */
+            --border-radius: 12px;
+        }
+
+        body {
+            font-family: 'Fredoka', sans-serif;
+            background-color: var(--bg-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .game-container {
+            background: white;
+            padding: 24px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            max-width: 95vw;
+            width: 400px; /* Max width for desktop/tablet */
+            text-align: center;
+        }
+
+        #game-board {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: repeat(4, 1fr);
+            gap: 5px;
+            width: 100%;
+            aspect-ratio: 1 / 1; /* Keep it square */
+            border: 5px solid var(--empty-color);
+            border-radius: var(--border-radius);
+            margin: 20px 0;
+            user-select: none;
+            touch-action: manipulation; /* Improves touch responsiveness */
+        }
+
+        .tile {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: clamp(24px, 6vw, 40px);
+            font-weight: 700;
+            background-color: var(--tile-color);
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.1s ease-out, opacity 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            position: relative;
+        }
+
+        .tile:hover:not(.empty-tile) {
+            background-color: #0069d9;
+            transform: scale(1.03);
+        }
+
+        .empty-tile {
+            background-color: var(--empty-color);
+            cursor: default;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            background-color: #28a745;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: background-color 0.2s, transform 0.1s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+            margin: 5px 0;
+        }
+
+        button:hover {
+            background-color: #218838;
+            transform: translateY(-1px);
+        }
+
+        #message {
+            margin-top: 15px;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #dc3545;
+            min-height: 30px;
+        }
+
+        /* Win Animation */
+        .win-message {
+            color: #28a745 !important;
+            animation: pulse 1s infinite alternate;
+        }
+
+        @keyframes pulse {
+            from { transform: scale(1); opacity: 1; }
+            to { transform: scale(1.05); opacity: 0.9; }
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="game-container">
+    <h1 class="text-3xl font-bold mb-4 text-gray-800">15 Puzzle</h1>
+
+    <div class="controls">
+        <span id="moves-counter" class="text-xl font-medium text-gray-700">Moves: 0</span>
+        <button id="shuffle-button">Shuffle & Start</button>
+    </div>
+
+    <div id="game-board">
+        <!-- Tiles will be rendered here by JavaScript -->
+    </div>
+
+    <div id="message" class="text-lg">
+        Click 'Shuffle & Start' to begin!
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // --- Firebase Configuration (Required for all Canvas projects, though not used for simple local games) ---
+        // This is necessary scaffolding for the execution environment.
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = typeof _firebase_config !== 'undefined' ? JSON.parse(_firebase_config) : null;
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+        // console.log("App ID:", appId, "Firebase Config Ready:", !!firebaseConfig);
+        // Note: For this simple single-player game, we do not require Firebase logic, but the environment variables are kept.
+        // ------------------------------------------------------------------------------------------------------
+
+
+        const boardElement = document.getElementById('game-board');
+        const movesCounter = document.getElementById('moves-counter');
+        const shuffleButton = document.getElementById('shuffle-button');
+        const messageElement = document.getElementById('message');
+
+        const SIZE = 4; // 4x4 grid
+        const BOARD_SIZE = SIZE * SIZE;
+        const WINNING_STATE = Array.from({ length: BOARD_SIZE - 1 }, (_, i) => i + 1).concat(0); // [1, 2, 3, ..., 15, 0]
+
+        let board = [];
+        let moves = 0;
+        let isGameRunning = false;
+
+        /**
+         * Converts a 1D index (0-15) to 2D coordinates [row, col].
+         * @param {number} index
+         * @returns {{row: number, col: number}}
+         */
+        const indexToCoords = (index) => ({
+            row: Math.floor(index / SIZE),
+            col: index % SIZE
+        });
+
+        /**
+         * Converts 2D coordinates [row, col] to a 1D index.
+         * @param {number} row
+         * @param {number} col
+         * @returns {number}
+         */
+        const coordsToIndex = (row, col) => row * SIZE + col;
+
+        /**
+         * Checks if the current board state is the solved state.
+         * @returns {boolean}
+         */
+        const checkWin = () => {
+            // Check if the current board matches the WINNING_STATE
+            for (let i = 0; i < BOARD_SIZE; i++) {
+                if (board[i] !== WINNING_STATE[i]) {
+                    return false;
+                }
+            }
+            return true;
+        };
+
+        /**
+         * Calculates the inversion count for the current board state.
+         * Used to check for solvability. (0 is excluded from counting inversions)
+         * @param {number[]} puzzle
+         * @returns {number}
+         */
+        const getInversions = (puzzle) => {
+            let inversions = 0;
+            const flat = puzzle.filter(n => n !== 0); // Exclude the empty tile
+
+            for (let i = 0; i < flat.length; i++) {
+                for (let j = i + 1; j < flat.length; j++) {
+                    if (flat[i] > flat[j]) {
+                        inversions++;
+                    }
+                }
+            }
+            return inversions;
+        };
+
+        /**
+         * Checks if the 15-puzzle is solvable.
+         * For a 4x4 grid: Solvable if (inversions + row_of_empty_tile) is even.
+         * @param {number[]} puzzle
+         * @returns {boolean}
+         */
+        const isSolvable = (puzzle) => {
+            const inversions = getInversions(puzzle);
+            const emptyIndex = puzzle.indexOf(0);
+            const emptyRow = indexToCoords(emptyIndex).row; // Rows are 0-indexed (0 to 3)
+
+            // Since rows are counted from bottom in the standard rule, 
+            // and our rows are 0-indexed from top (0, 1, 2, 3), we use the 0-indexed row for the check.
+            // Row 0, 2 are 'odd' from bottom. Row 1, 3 are 'even' from bottom.
+            // Parity Check: (inversions % 2) === ((SIZE - emptyRow) % 2) for standard rule.
+            // Simpler check for 4x4: (inversions + emptyRow) should be even.
+            // Since we are using 0-indexed row from top:
+            // If emptyRow is 0 or 2 (odd from bottom), and inversions is odd -> (odd + odd) = even -> Solvable.
+            // If emptyRow is 1 or 3 (even from bottom), and inversions is even -> (even + even) = even -> Solvable.
+
+            // The common formula (for even width N): Solvable if (Inversions + EmptyTileRowFromBottom) is even.
+            // Our 0-indexed row (0-3) from top corresponds to row_from_bottom (4, 3, 2, 1).
+            const emptyRowFromBottom = SIZE - emptyRow;
+
+            return (inversions + emptyRowFromBottom) % 2 === 0;
+        };
+
+
+        /**
+         * Shuffles the board into a guaranteed solvable state and starts the game.
+         */
+        const shuffleBoard = () => {
+            messageElement.classList.remove('win-message');
+            messageElement.textContent = "Good luck, solve the puzzle!";
+
+            do {
+                // Generate a random permutation of [1, 2, ..., 15, 0]
+                board = Array.from({ length: BOARD_SIZE - 1 }, (_, i) => i + 1).concat(0);
+                for (let i = board.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [board[i], board[j]] = [board[j], board[i]];
+                }
+            } while (!isSolvable(board) || checkWin()); // Ensure it's solvable and not already solved
+
+            moves = 0;
+            isGameRunning = true;
+            updateMovesCounter();
+            renderBoard();
+        };
+
+        /**
+         * Renders the current state of the 'board' array to the DOM.
+         */
+        const renderBoard = () => {
+            boardElement.innerHTML = '';
+            board.forEach((value, index) => {
+                const tile = document.createElement('div');
+                tile.dataset.value = value;
+                tile.dataset.index = index;
+                tile.textContent = value === 0 ? '' : value;
+                tile.classList.add('tile');
+
+                if (value === 0) {
+                    tile.classList.add('empty-tile');
+                } else {
+                    // Attach click listener only to movable tiles
+                    tile.addEventListener('click', handleTileClick);
+                }
+                boardElement.appendChild(tile);
+            });
+        };
+
+        /**
+         * Handles the click event on a tile.
+         * @param {Event} event
+         */
+        const handleTileClick = (event) => {
+            if (!isGameRunning) return;
+
+            const clickedTileValue = parseInt(event.currentTarget.dataset.value);
+            const clickedTileIndex = parseInt(event.currentTarget.dataset.index);
+
+            // 1. Find the empty tile's index (value 0)
+            const emptyTileIndex = board.indexOf(0);
+
+            // 2. Check if the clicked tile is adjacent to the empty tile
+            const { row: clickedRow, col: clickedCol } = indexToCoords(clickedTileIndex);
+            const { row: emptyRow, col: emptyCol } = indexToCoords(emptyTileIndex);
+
+            const isAdjacent = (
+                (Math.abs(clickedRow - emptyRow) === 1 && clickedCol === emptyCol) || // Vertical move
+                (Math.abs(clickedCol - emptyCol) === 1 && clickedRow === emptyRow)    // Horizontal move
+            );
+
+            if (isAdjacent) {
+                // 3. Swap the clicked tile and the empty tile in the 'board' array
+                [board[clickedTileIndex], board[emptyTileIndex]] = [board[emptyTileIndex], board[clickedTileIndex]];
+
+                moves++;
+                updateMovesCounter();
+
+                // 4. Re-render the board to reflect the swap
+                renderBoard();
+
+                // 5. Check for win condition
+                if (checkWin()) {
+                    handleWin();
+                }
+            }
+        };
+
+        /**
+         * Updates the moves counter display.
+         */
+        const updateMovesCounter = () => {
+            movesCounter.textContent = Moves: ${moves};
+        };
+
+        /**
+         * Executes when the puzzle is solved.
+         */
+        const handleWin = () => {
+            isGameRunning = false;
+            // Visually complete the puzzle by displaying the '16' tile (which was 0)
+            const emptyTileElement = boardElement.querySelector('.empty-tile');
+            if (emptyTileElement) {
+                emptyTileElement.textContent = BOARD_SIZE;
+                emptyTileElement.classList.remove('empty-tile');
+                emptyTileElement.style.backgroundColor = 'var(--tile-color)';
+                emptyTileElement.style.color = 'white';
+            }
+
+            messageElement.textContent = You Solved it in ${moves} moves!;
+            messageElement.classList.add('win-message');
+        };
+
+        // --- Initialization ---
+        shuffleButton.addEventListener('click', shuffleBoard);
+
+        // Initial render of a solved board (before shuffle)
+        board = WINNING_STATE.slice();
+        renderBoard();
+        isGameRunning = false;
+
+    });
+</script>
+
+</body>
+</html>

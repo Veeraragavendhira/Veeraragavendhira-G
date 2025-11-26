@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dropdown Menu</title>
+    <style type="text/css">
+        #menuitems 
+        {
+            text-decoration: none;
+            background-color: aqua;
+            display: block;
+        }
+        #menu
+        {
+            display: inline-block;
+        }
+        #menu #menuitems
+        {
+            display: none;
+        }
+        #menu.hover #menuitems
+        {
+            display: block;
+            background-color: blueviolet;
+        }
+    </style>
+</head>
+<body>
+    <div id="menu">
+        <button>details</button>
+        <div id="menuitems">
+            <a href="#">ONE</a>
+            <a href="#">TWO</a>
+            <a href="#">THREE</a>
+            <a href="#">FOUR</a>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,21 @@
+ < style type ="text/css">
+        h1{
+            background-color: bisque;
+            color: blue;
+        }
+        #a1{
+            background-color: black;
+            color: antiquewhite;
+        }
+        h2{
+            background-color: chartreuse;
+            color: rgb(44, 8, 247); 
+            border: 10px double yellow;
+        }
+        {
+            border-radius: 10%;
+            background-color: blue;
+            border: 100px ridge black;
+            /* inset outset double ridge none  */
+        }
+    </style>
